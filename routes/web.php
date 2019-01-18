@@ -19,6 +19,7 @@ Auth::routes();
 
 
 Route::group(['prefix'=>'admin', 'middleware'=>'auth'], function(){
+
 	Route::get('logout', '\Auth\LoginController@logout');
 
 	Route::get('home', [
@@ -43,14 +44,14 @@ Route::group(['prefix'=>'admin', 'middleware'=>'auth'], function(){
 		'uses' => 'AjaxController@suppliersAjax',
 		'as' => 'suppliersPostAjax'
 	]);
-	Route::get('/productsAjax', [
-		'uses' => 'AjaxController@productsAjax',
-		'as' => 'productsAjax'
-	]);
-	Route::post('/productsPostAjax', [
-		'uses' => 'AjaxController@productsAjax',
-		'as' => 'productsPostAjax'
-	]);
+	// Route::get('/productsAjax', [
+	// 	'uses' => 'AjaxController@productsAjax',
+	// 	'as' => 'productsAjax'
+	// ]);
+	// Route::post('/productsPostAjax', [
+	// 	'uses' => 'AjaxController@productsAjax',
+	// 	'as' => 'productsPostAjax'
+	// ]);
 	Route::get('/productsShopsAjax', [
 		'uses' => 'AjaxController@productsShopsAjax',
 		'as' => 'productsShopsAjax'
@@ -58,6 +59,14 @@ Route::group(['prefix'=>'admin', 'middleware'=>'auth'], function(){
 	Route::post('/productsShopsPostAjax', [
 		'uses' => 'AjaxController@productsShopsAjax',
 		'as' => 'productsShopsPostAjax'
+	]);
+	// Route::post('/productsPostAjax', [
+	// 	'uses' => 'AjaxController@productsBarcodeAjax',
+	// 	'as' => 'productsPostAjax'
+	// ]);
+	Route::post('/allProductsAjax', [
+		'uses' => 'AjaxController@allProductsAjax',
+		'as' => 'allProductsAjax'
 	]);
 
 	/* Users  */
@@ -191,6 +200,10 @@ Route::group(['prefix'=>'admin', 'middleware'=>'auth'], function(){
 		'uses' => 'ProductsController@storeTransfer',
 		'as' => 'product.storeTransfer'
 	]);
+	// Route::post('/productsPostAjax', [
+	// 	'uses' => 'SalesController@productsBarcodeAjax',
+	// 	'as' => 'productsPostAjax'
+	// ]);
 
 	/* Shop */
 	Route::get('/shops', [
@@ -379,6 +392,10 @@ Route::group(['prefix'=>'admin', 'middleware'=>'auth'], function(){
 		'uses' => 'ReportsController@productEntryReport',
 		'as' => 'productEntryReport'	
 	]);
+	Route::post('/productEntryReport', [
+		'uses' => 'ReportsController@productEntryReportDateBetween',
+		'as' => 'productEntryReport'	
+	]);
 	Route::get('/salesReport', [
 		'uses' => 'ReportsController@salesReport',
 		'as' => 'salesReport'	
@@ -399,7 +416,7 @@ Route::group(['prefix'=>'admin', 'middleware'=>'auth'], function(){
 	Route::post('/returnReport', [
 		'uses' => 'ReportsController@returnReportBetweenDate',
 		'as' => 'returnReport'	
-	]);
+	]);	
 	Route::get('/viewReturn/{id}', [
 		'uses' => 'ReportsController@viewReturn',
 		'as' => 'viewReturn'
@@ -473,6 +490,10 @@ Route::group(['prefix'=>'admin', 'middleware'=>'auth'], function(){
 	]);
 	Route::get('/supplier/allSupplierBills', [
 		'uses' => 'SuppliersController@allSupplierBills',
+		'as' => 'supplier.allSupplierBills'
+	]);
+	Route::post('/supplier/allSupplierBills', [
+		'uses' => 'SuppliersController@allSupplierBillsBetweenDate',
 		'as' => 'supplier.allSupplierBills'
 	]);
 	Route::get('/supplier/supplierBill', [

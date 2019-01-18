@@ -34,9 +34,9 @@
 			padding: 0px 0px;
 		}
 	 	@media print{
-			.with_print{
+			/*.d-print-none{
 	            display: none;
-	        }
+	        }*/
 	        .page-break	{
 				display: block; 
 				page-break-before: auto;		
@@ -56,14 +56,14 @@
 		<div id="page-wrapper">
 			<div class="container">
 				
-				<div class="row with_print">
+				<div class="row d-print-none">
 					<div class="col-md-6 m-bottom-25">
 						<h3 class="page-header">Print Barcode</h3>
 					</div>
 					<div class="col-md-6">
 						<div class="text-right m-top-25">
 
-							<button class="btn btn-success with_print" name="print" onclick="window.print()"><i class="fa fa-print"></i> Print</button>
+							<button class="btn btn-success d-print-none" name="print" onclick="window.print()"><i class="fa fa-print"></i> Print</button>
 
 							<a class="btn btn-danger" type="submit" href="{{ route('barcode.destroyPrintBarcode') }}"></i> Back</a>
 

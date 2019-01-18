@@ -26,7 +26,7 @@ class ReportsController extends Controller
             ->with('heading', "Today's Return")
             ->with('returnProductDetails', ReturnProductDetail::all())
             ->with('returnSaleDetails', ReturnSaleDetail::all())
-            ->with('returnProducts', ReturnProduct::whereDate('created_at', date('Y-m-d'))->orderBy('created_at', 'desc')->get());
+            ->with('returnProducts', ReturnProduct::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->get());
     }
     public function viewReturn($id){ 
         return view('admin.reports.viewReturn')
@@ -51,19 +51,28 @@ class ReportsController extends Controller
     public function salesReport(){
         return view('admin.reports.salesReport')
             ->with('heading', "Today's Sale")
+            ->with('totalSale', Sale::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->sum('totalBill'))
+            ->with('paidAmount', Sale::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->sum('paidAmount'))
+            ->with('totalProfit', Sale::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->sum('profit'))
             ->with('saleDetails', SaleDetail::all())
-            ->with('sales', Sale::whereDate('created_at', date('Y-m-d'))->orderBy('created_at', 'desc')->get());
+            ->with('sales', Sale::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->orderBy('created_at', 'desc')->get());
     }
     public function salesReportBetweenDate(Request $request){
+
         $this->validate($request, [
             'date_from' => 'required',
             'date_to' => 'required',
         ]);
+
+
         $date_from = $request->date_from.' '.date('00:00:01');
         $date_to = $request->date_to.' '.date('23:59:59');
         return view('admin.reports.salesReport')
             ->with('heading', '')
             ->with('saleDetails', SaleDetail::all())
+            ->with('totalSale', Sale::whereBetween('created_at', [$date_from, $date_to])->sum('totalBill'))
+            ->with('paidAmount', Sale::whereBetween('created_at', [$date_from, $date_to])->sum('paidAmount'))
+            ->with('totalProfit', Sale::whereBetween('created_at', [$date_from, $date_to])->sum('profit'))
             ->with('sales', Sale::whereBetween('created_at', [$date_from, $date_to])->orderBy('created_at', 'desc')->get());
     }
     public function viewSale($id){ 
@@ -74,8 +83,23 @@ class ReportsController extends Controller
 
     public function productEntryReport(){
         return view('admin.reports.productEntryReport')
-            ->with('entries', Stock::all());
+            ->with('entries', Stock::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->get());
     }
+
+    public function productEntryReportDateBetween(Request $request){
+
+        $this->validate($request, [
+            'date_from' => 'required',
+            'date_to' => 'required',
+        ]);
+
+
+        $date_from = $request->date_from.' '.date('00:00:01');
+        $date_to = $request->date_to.' '.date('23:59:59');
+        return view('admin.reports.productEntryReport')
+            ->with('entries', Stock::whereBetween('created_at', [$date_from, $date_to])->orderBy('created_at', 'desc')->get());
+    }
+
     public function financialInsight(){
         $products = Product::all();
         $productsBuyPrice = 0;

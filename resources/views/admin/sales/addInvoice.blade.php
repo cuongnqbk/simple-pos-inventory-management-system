@@ -89,7 +89,6 @@
                                             <td style="width:20%;" id="quantity{{ $cart->id }}">
                                                 <div class="input-group">
                                                     <input class="form-control form-control-sm" type="number" value="{{ $cart->qty }}" id="qty{{ $cart->id }}" style="width:50px;" onchange="chageQty('{{ $cart->id }}','{{ $cart->qty }}','{{ $cart->rowId }}','{{ $cart->options['total_quantity'] }}')" name="qty{{ $cart->id }}">
-
                                                     
                                                     <div class="input-group-btn">
                                                         <button type="button" class="btn btn-info btn-custom" onclick="plusQuantity('{{ $cart->rowId }}','{{ $cart->options['total_quantity'] }}','{{ $cart->id }}','{{ $cart->price }}')" >
@@ -128,93 +127,114 @@
 <section class="m-b-50 invoiceDetails">
     <form action="{{ route('cart.cartStore') }}" method="post">
     @csrf
-        <div class="card border-dark m-b-25">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4 form-group">
-                        <label for="subtotal">Client</label>
-                        <select name="client_id" id="client_id" class="forselect2 form-control{{ $errors->has('client_id') ? ' is-invalid' : '' }}">
-                            <option disabled selected>Choose a Client</option>
-                            @foreach($clients as $client)
-                            <option value="{{ $client->id }}">{{ $client->name }}</option>
-                            @endforeach
-                        </select>
-                        @if ($errors->has('client_id'))
-                            <span class="invalid-feedback">
-                                <strong>{{ $errors->first('client_id') }}</strong>
-                            </span>
-                        @endif
-                    </div>
-                    <div class="col-md-4 form-group">
-                        <label for="subtotal">Contact No</label>
-                        <input type="text" class="form-control" name="contact_no" id="contact_no" readonly>
-                    </div>
-                    <div class="col-md-4 form-group">
-                        <label for="subtotal">Address</label>
-                        <input type="text" class="form-control" name="address" id="address" readonly>
-                    </div>
-                </div>
+      <div class="card border-dark m-b-25">
+          <div class="card-body">
+              <div class="row">
+                  <div class="col-md-4 form-group">
+                      <label for="subtotal">Client</label>
+                      <select name="client_id" id="client_id" class="forselect2 form-control{{ $errors->has('client_id') ? ' is-invalid' : '' }}">
+                          <option disabled selected>Choose a Client</option>
+                          @foreach($clients as $client)
+                          <option value="{{ $client->id }}">{{ $client->name }}</option>
+                          @endforeach
+                      </select>
+                      @if ($errors->has('client_id'))
+                          <span class="invalid-feedback">
+                              <strong>{{ $errors->first('client_id') }}</strong>
+                          </span>
+                      @endif
+                  </div>
+                  <div class="col-md-4 form-group">
+                      <label for="subtotal">Contact No</label>
+                      <input type="text" class="form-control" name="contact_no" id="contact_no" readonly>
+                  </div>
+                  <div class="col-md-4 form-group">
+                      <label for="subtotal">Address</label>
+                      <input type="text" class="form-control" name="address" id="address" readonly>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="card border-dark">
+        <div class="card-body">
+          <div class="row">                        
+            <div class="col-md-3 form-group">
+              <label for="uniqueItem">Unique Items</label>
+              <input type="text" class="form-control" name="uniqueItem" id="uniqueItem" value="{{ Cart::content()->count() }}" readonly>
+            </div>   
+
+            <div class="col-md-3 form-group">
+              <label for="subtotal">Total Items</label>
+              <input type="text" class="form-control" name="totalItems" id="totalItems" value="{{ Cart::count() }}" readonly>
             </div>
-        </div>
-        <div class="card border-dark">
-            <div class="card-body">
-                <div class="row">                        
-                    <div class="col-md-3 form-group">
-                        <label for="uniqueItem">Unique Items</label>
-                        <input type="text" class="form-control" name="uniqueItem" id="uniqueItem" value="{{ Cart::content()->count() }}" readonly>
-                    </div>                        
-                    <div class="col-md-3 form-group">
-                        <label for="subtotal">Total Items</label>
-                        <input type="text" class="form-control" name="totalItems" id="totalItems" value="{{ Cart::count() }}" readonly>
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="subtotal">Subtotal</label>
-                        <input type="text" class="form-control" name="subTotal" id="subTotal" value="{{  ceil(+str_replace(',', '', Cart::subtotal())) }}" readonly>
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="subtotal">Additional Cost</label>
-                        <input type="text" class="form-control" name="additionalCost" id="additionalCost" value="0">
-                    </div>       
-                    <div class="col-md-4 form-group">
-                        <label for="subtotal">Total Bill</label>
-                        <input type="text" class="form-control" name="totalBill" id="totalBill" value="{{ ceil(+str_replace(',', '', Cart::subtotal())) }}" readonly>
-                    </div>
-                    <div class="col-md-4 form-group">
-                        <label for="subtotal">Discount</label>
-                        <input type="text" class="form-control" name="discount" id="discount" value="0">
-                    </div>
-                    <div class="col-md-4 form-group">
-                        <label for="subtotal">Previous Due</label>
-                        <input type="text" class="form-control" name="previousDue" id="previousDue" value="0" readonly>
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="subtotal">Grand Total</label>
-                        <input type="text" class="form-control" name="grandTotal" id="grandTotal" value="{{ ceil(+str_replace(',', '', Cart::subtotal())) }}" readonly>
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="subtotal">Paid Amount</label>
-                        <input type="text" class="form-control{{ $errors->has('paidAmount') ? ' is-invalid' : '' }}" name="paidAmount" id="paidAmount" value="">
-                         @if ($errors->has('paidAmount'))
-                            <span class="invalid-feedback">
-                                <strong>{{ $errors->first('paidAmount') }}</strong>
-                            </span>
-                        @endif
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="subtotal">Total Due</label>
-                        <input type="text" class="form-control" name="totalDue" id="totalDue" value="" readonly>
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="subtotal">Total Profit</label>
-                        <input type="text" class="form-control" name="totalProfit" id="totalProfit" value="{{ 0 }}" readonly>
-                    </div>
-                    <input type="hidden" id="lastSpecialPrice" name="lastSpecialPrice" id="lastSpecialPrice">
-                    <div class="col-md-12">
-                        <button class="btn btn-primary" type="submit">Save</button>
-                    </div>
-                </div>
+
+            <div class="col-md-3 form-group">
+              <label for="subtotal">Subtotal</label>
+              <input type="text" class="form-control" name="subTotal" id="subTotal" value="{{  ceil(+str_replace(',', '', Cart::subtotal())) }}" readonly>
             </div>
+            <div class="col-md-3 form-group">
+              <label for="subtotal">Additional Cost</label>
+              <input type="text" class="form-control" name="additionalCost" id="additionalCost" value="0">
+            </div>    
+
+            <div class="col-md-4 form-group">
+              <label for="subtotal">Total Bill</label>
+              <input type="text" class="form-control" name="totalBill" id="totalBill" value="{{ ceil(+str_replace(',', '', Cart::subtotal())) }}" readonly>
+            </div>
+
+            <div class="col-md-4 form-group">
+              <label for="subtotal">Discount</label>
+              <input type="text" class="form-control" name="discount" id="discount" value="0">
+            </div>
+
+            <div class="col-md-4 form-group">
+              <label for="subtotal">Previous Due</label>
+              <input type="text" class="form-control" name="previousDue" id="previousDue" value="0" readonly>
+            </div>
+
+            <div class="col-md-3 form-group">
+              <label for="subtotal">Grand Total</label>
+              <input type="text" class="form-control" name="grandTotal" id="grandTotal" value="{{ ceil(+str_replace(',', '', Cart::subtotal())) }}" readonly>
+            </div>
+
+            <div class="col-md-3 form-group">
+              <label for="subtotal">Paid Amount</label>
+              <input type="text" class="form-control{{ $errors->has('paidAmount') ? ' is-invalid' : '' }}" name="paidAmount" id="paidAmount" value="">
+              @if ($errors->has('paidAmount'))
+                <span class="invalid-feedback">
+                  <strong>{{ $errors->first('paidAmount') }}</strong>
+                </span>
+              @endif
+            </div>
+
+            <div class="col-md-3 form-group">
+              <label for="subtotal">Total Due</label>
+              <input type="text" class="form-control" name="totalDue" id="totalDue" value="" readonly>
+            </div>
+            <p class="hidden">
+              <?php
+                $profit = 0; 
+                foreach(Cart::content() as $cart){
+                  $cartQty =  $cart->qty;
+                  $subProfit = $cart->options->profit * $cartQty;
+                  $profit += $subProfit;
+                }                 
+              ?>               
+            </p>
+            {{-- Profit --}}
+            <div class="col-md-3 form-group">
+              <label for="subtotal">Invoice Number</label>
+              <input type="text" class="form-control" name="totalProfit" id="totalProfit" value="{{ $profit }}" readonly>
+            </div>
+
+            <input type="hidden" id="lastSpecialPrice" name="lastSpecialPrice"id="lastSpecialPrice">
+
+            <div class="col-md-12">
+              <button class="btn btn-primary" type="submit">Save</button>
+            </div>
+          </div>
         </div>
+      </div>
     </form>
 </section>
 @endsection

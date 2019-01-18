@@ -15,11 +15,53 @@
 <section class="m-t-80 m-b-50">
     <div class="row">
         <div class="col">
+            <div class="card border-dark">
+                <div class="card-body">
+                    <form action="{{ route('supplier.allSupplierBills') }}" method="post">
+                        {{ csrf_field() }}
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>Date From</label>
+                                <input type="text" id="startDate" class="form-control datepicker" name="expense_date_from" value="{{ old('') }}"/>
+                                @if ($errors->has('expense_date_from'))
+                                    <span class="invalid-feedback">
+                                        <strong>{{ $errors->first('expense_date_from') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Date To</label>
+                                <input class="form-control datepicker" name="expense_date_to" value="{{ old('') }}">
+
+                                @if ($errors->has('expense_date_to'))
+                                    <span class="invalid-feedback">
+                                        <strong>{{ $errors->first('expense_date_to') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="col text-right">
+                                <button class="btn btn-primary" name="dateRangeSubmit">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
             <div class="card border-dark filterable">
-                <div class="card-header text-right bg-dark">
-                    <a class="btn btn-primary" href="{{ route('supplier.supplierBill') }}" role="button">Add New Supplier Bill</a>
-                    <button id="filter_button" class="btn btn-primary btn-filter"><i class="fa fa-filter"></i> Filter
-                    </button>
+                <div class="card-header bg-dark">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5 class="text-white">Total: {{ $totalBill }}</h5>
+                        </div>
+                        <div class="col-md-8 text-right">
+                            <a class="btn btn-primary" href="{{ route('supplier.supplierBill') }}" role="button">Add New Supplier Bill</a>
+                            <button id="filter_button" class="btn btn-primary btn-filter"><i class="fa fa-filter"></i> Filter
+                            </button>
+                        </div>
+                    </div>                    
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered table-hover table-striped">
@@ -32,7 +74,7 @@
                                     <input type="text" class="form-control" placeholder="Supplier" data-toggle="true" disabled>
                                 </th>
                                 <th>
-                                    <input type="text" class="form-control" placeholder="Due" disabled>
+                                    <input type="text" class="form-control" placeholder="Amount" disabled>
                                 </th>
                                 <th>
                                     <input type="text" class="form-control" placeholder="Details" disabled>

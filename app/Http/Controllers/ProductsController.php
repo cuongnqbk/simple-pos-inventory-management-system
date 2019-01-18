@@ -22,6 +22,8 @@ class ProductsController extends Controller
             $productsBuyPrice += $product->stockQuantity * $product->buyPrice;
             $productsSalePrice += $product->stockQuantity * $product->salePrice;
         }
+
+        // dd($productsSalePrice);
         return view('admin.products.showInventory')
                 ->with('productTypes', ProductType::all())
                 ->with('productsCount', Product::count('id'))
@@ -29,7 +31,8 @@ class ProductsController extends Controller
                 ->with('productsBuyPrice', $productsBuyPrice)
                 ->with('products', Product::all());
     }
-    
+
+
     public function create()
     {
         return view('admin.products.create')

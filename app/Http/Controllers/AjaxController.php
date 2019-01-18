@@ -19,9 +19,27 @@ class AjaxController extends Controller
         return response()->json(Supplier::all());
     }
 
-    public function productsAjax(){
+    // public function productsAjax(Request $request){
+    //     $product = Product::where('productBarcode', $request->productBarcode)->first();
+    //     $data = array(
+    //         'productBarcode' => $product->productBarcode,
+    //         'price' => $product->salePrice,
+    //     );
+    //     echo json_encode($data);
+    // }
+
+    public function allProductsAjax(){
         return response()->json(Product::all());
     }
+
+    // public function productsBarcodeAjax(Request $request){
+    //     $product = Product::where('productBarcode', $request->productBarcode)->first();
+    //     $data = array(
+    //         'productBarcode' => $product->productBarcode,
+    //         'price' => $product->salePrice,
+    //     );
+    //     echo json_encode($data);
+    // }
 
     public function productsShopsAjax(){
         $productsShops = DB::table('product_shop')->get();

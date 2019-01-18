@@ -112,22 +112,28 @@
                 		</div>
                 	</div>
                 	<div class="row">
-                		<div class="col-md-4">
+                		<div class="col-md-3">
                 			<div class="form-group">
                 				<label for="">Total Bill</label>
                 				<input type="text" class="form-control" name="" value="{{ $sale->totalBill }}" readonly>
                 			</div>
                 		</div>
-                		<div class="col-md-4">
+                		<div class="col-md-3">
                 			<div class="form-group">
                 				<label for="">Grand total</label>
                 				<input type="text" class="form-control" name="" value="{{ $sale->totalBill}}" readonly>
                 			</div>
                 		</div>
-                		<div class="col-md-4">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="">Paid amount</label>
+                                <input type="text" class="form-control" name="" value="{{ $sale->paidAmount }}" readonly>
+                            </div>
+                        </div>
+                		<div class="col-md-3">
                 			<div class="form-group">
-                				<label for="">Paid amount</label>
-                				<input type="text" class="form-control" name="" value="{{ $sale->paidAmount }}" readonly>
+                				<label for="">Profit</label>
+                				<input type="text" class="form-control" name="" value="{{ $sale->profit }}" readonly>
                 			</div>
                 		</div>
                 	</div>

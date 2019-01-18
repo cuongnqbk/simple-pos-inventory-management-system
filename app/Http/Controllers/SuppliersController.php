@@ -80,7 +80,8 @@ class SuppliersController extends Controller
     {
         return view('admin.suppliers.allSupplierExpenses')
             ->with('suppliers', Supplier::all())
-            ->with('supplierExpenses', SupplierExpense::orderBy('created_at', 'desc')->get());
+            ->with('totalExpense', SupplierExpense::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->sum('amount'))
+            ->with('supplierExpenses', SupplierExpense::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->orderBy('created_at', 'desc')->get());
     }
     public function allSupplierExpensesBetweenDate(Request $request)
     {
@@ -97,38 +98,47 @@ class SuppliersController extends Controller
         if(!isset($supplier_id) && $date_from === null && $date_to === null){
             return view('admin.suppliers.allSupplierExpenses')
                 ->with('suppliers', Supplier::all())
-                ->with('supplierExpenses', SupplierExpense::take(10)->orderBy('created_at', 'desc')->get());
+                ->with('totalExpense', SupplierExpense::all()->sum('amount'))
+                ->with('supplierExpenses', SupplierExpense::orderBy('created_at', 'desc')->get());
         }else if(isset($supplier_id) && $date_from === null && $date_to === null){
             return view('admin.suppliers.allSupplierExpenses')
                 ->with('suppliers', Supplier::all())
+                ->with('totalExpense', SupplierExpense::where('supplier_id', $supplier_id)->sum('amount'))
                 ->with('supplierExpenses', SupplierExpense::where('supplier_id', $supplier_id)->orderBy('created_at', 'desc')->get());
         }else if(isset($supplier_id) && isset($date_from) && $date_to === null){
             return view('admin.suppliers.allSupplierExpenses')
                 ->with('suppliers', Supplier::all())
+                ->with('totalExpense', SupplierExpense::where('supplier_id', $supplier_id)->where('created_at', '>=' , $expense_date_from)->sum('amount'))
                 ->with('supplierExpenses', SupplierExpense::where('supplier_id', $supplier_id)->where('created_at', '>=' , $expense_date_from)->orderBy('created_at', 'desc')->get());
         }else if(isset($supplier_id) && $date_from === null && isset($date_to) ){          
             return view('admin.suppliers.allSupplierExpenses')
                 ->with('suppliers', Supplier::all())
+                ->with('totalExpense', SupplierExpense::where('supplier_id', $supplier_id)->whereBetween('created_at', [$expense_date_to_start, $expense_date_to])->sum('amount'))
                 ->with('supplierExpenses', SupplierExpense::where('supplier_id', $supplier_id)->whereBetween('created_at', [$expense_date_to_start, $expense_date_to])->orderBy('created_at', 'desc')->get());
         }else if(!isset($supplier_id) && isset($date_from) && $date_to === null){          
             return view('admin.suppliers.allSupplierExpenses')
                 ->with('suppliers', Supplier::all())
+                ->with('totalExpense', SupplierExpense::where('created_at', '>=' , $expense_date_from)->sum('amount'))
                 ->with('supplierExpenses', SupplierExpense::where('created_at', '>=' , $expense_date_from)->orderBy('created_at', 'desc')->get());            
         }else if(!isset($supplier_id) && $date_from === null && isset($date_to) ){          
             return view('admin.suppliers.allSupplierExpenses')
                 ->with('suppliers', Supplier::all())
+                ->with('totalExpense', SupplierExpense::whereBetween('created_at', [$expense_date_to_start, $expense_date_to])->sum('amount'))
                 ->with('supplierExpenses', SupplierExpense::whereBetween('created_at', [$expense_date_to_start, $expense_date_to])->orderBy('created_at', 'desc')->get());
         }else if(!isset($supplier_id) && isset($date_from) && isset($date_to) ){          
             return view('admin.suppliers.allSupplierExpenses')
                 ->with('suppliers', Supplier::all())
+                ->with('totalExpense', SupplierExpense::whereBetween('created_at', [$expense_date_from, $expense_date_to])->sum('amount'))
                 ->with('supplierExpenses', SupplierExpense::whereBetween('created_at', [$expense_date_from, $expense_date_to])->orderBy('created_at', 'desc')->get());
         }else if(isset($supplier_id) && isset($date_from) && isset($date_to) ){          
             return view('admin.suppliers.allSupplierExpenses')
                 ->with('suppliers', Supplier::all())
+                ->with('totalExpense', SupplierExpense::where('supplier_id', $supplier_id)->whereBetween('created_at', [$expense_date_from, $expense_date_to])->sum('amount'))
                 ->with('supplierExpenses', SupplierExpense::where('supplier_id', $supplier_id)->whereBetween('created_at', [$expense_date_from, $expense_date_to])->orderBy('created_at', 'desc')->get());
         }else{
             return view('admin.suppliers.allSupplierExpenses')
                 ->with('suppliers', Supplier::all())
+                ->with('totalExpense', SupplierExpense::whereBetween('created_at', [$expense_date_from, $expense_date_to])->sum('amount'))
                 ->with('supplierExpenses', SupplierExpense::whereBetween('created_at', [$expense_date_from, $expense_date_to])->orderBy('created_at', 'desc')
                 ->get());
         }
@@ -165,7 +175,68 @@ class SuppliersController extends Controller
 
     public function allSupplierBills()
     {
-        return view('admin.suppliers.allSupplierBills')->with('supplierBills', SupplierBill::orderBy('created_at', 'desc')->get());
+        return view('admin.suppliers.allSupplierBills')
+                ->with('totalBill', SupplierBill::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->sum('amount'))
+                ->with('supplierBills', SupplierBill::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->orderBy('created_at', 'desc')->get());
+    }
+    public function allSupplierBillsBetweenDate(Request $request)
+    {
+        $date_from = $request->expense_date_from;
+        $date_to = $request->expense_date_to;
+
+        $expense_date_from = $request->expense_date_from.' '.date('00:00:01');
+        $expense_date_from_end = $request->expense_date_from.' '.date('23:59:59');
+        $expense_date_to = $request->expense_date_to.' '.date('23:59:59');
+        $expense_date_to_start = $request->expense_date_to.' '.date('00:00:01');
+
+
+        if($date_from === null && $date_to === null){
+            return view('admin.suppliers.allSupplierBills')
+                ->with('suppliers', Supplier::all())
+                ->with('totalBill', SupplierBill::all()->sum('amount'))
+                ->with('supplierBills', SupplierBill::orderBy('created_at', 'desc')->get());
+        }else if($date_from === null && $date_to === null){
+            return view('admin.suppliers.allSupplierBills')
+                ->with('suppliers', Supplier::all())
+                ->with('totalBill', SupplierBill::all()->sum('amount'))
+                ->with('supplierBills', SupplierBill::orderBy('created_at', 'desc')->get());
+        }else if(isset($date_from) && $date_to === null){
+            return view('admin.suppliers.allSupplierBills')
+                ->with('suppliers', Supplier::all())
+                ->with('totalBill', SupplierBill::where('created_at', '>=' , $expense_date_from)->orderBy('created_at', 'desc')->sum('amount'))
+                ->with('supplierBills', SupplierBill::where('created_at', '>=' , $expense_date_from)->orderBy('created_at', 'desc')->get());
+        }else if($date_from === null && isset($date_to) ){          
+            return view('admin.suppliers.allSupplierBills')
+                ->with('suppliers', Supplier::all())
+                ->with('totalBill', SupplierBill::whereBetween('created_at', [$expense_date_to_start, $expense_date_to])->orderBy('created_at', 'desc')->sum('amount'))
+                ->with('supplierBills', SupplierBill::whereBetween('created_at', [$expense_date_to_start, $expense_date_to])->orderBy('created_at', 'desc')->get());
+        }else if(isset($date_from) && $date_to === null){          
+            return view('admin.suppliers.allSupplierBills')
+                ->with('suppliers', Supplier::all())
+                ->with('totalBill', SupplierBill::where('created_at', '>=' , $expense_date_from)->orderBy('created_at', 'desc')->sum('amount'))
+                ->with('supplierBills', SupplierBill::where('created_at', '>=' , $expense_date_from)->orderBy('created_at', 'desc')->get());            
+        }else if($date_from === null && isset($date_to) ){          
+            return view('admin.suppliers.allSupplierBills')
+                ->with('suppliers', Supplier::all())
+                ->with('totalBill', SupplierBill::whereBetween('created_at', [$expense_date_to_start, $expense_date_to])->sum('amount'))
+                ->with('supplierBills', SupplierBill::whereBetween('created_at', [$expense_date_to_start, $expense_date_to])->orderBy('created_at', 'desc')->get());
+        }else if(isset($date_from) && isset($date_to) ){          
+            return view('admin.suppliers.allSupplierBills')
+                ->with('suppliers', Supplier::all())
+                ->with('totalBill', SupplierBill::whereBetween('created_at', [$expense_date_from, $expense_date_to])->sum('amount'))
+                ->with('supplierBills', SupplierBill::whereBetween('created_at', [$expense_date_from, $expense_date_to])->orderBy('created_at', 'desc')->get());
+        }else if(isset($date_from) && isset($date_to) ){          
+            return view('admin.suppliers.allSupplierBills')
+                ->with('suppliers', Supplier::all())
+                ->with('totalBill', SupplierBill::whereBetween('created_at', [$expense_date_from, $expense_date_to])->sum('amount'))
+                ->with('supplierBills', SupplierBill::whereBetween('created_at', [$expense_date_from, $expense_date_to])->orderBy('created_at', 'desc')->get());
+        }else{
+            return view('admin.suppliers.allSupplierBills')
+                ->with('suppliers', Supplier::all())
+                ->with('totalBill', SupplierBill::whereBetween('created_at', [$expense_date_from, $expense_date_to])->sum('amount'))
+                ->with('supplierBills', SupplierBill::whereBetween('created_at', [$expense_date_from, $expense_date_to])->orderBy('created_at', 'desc')
+                ->get());
+        }
     }
     public function supplierBill()
     {

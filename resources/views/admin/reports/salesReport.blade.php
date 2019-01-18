@@ -55,7 +55,7 @@
         <div class="col">
             <div class="card border-dark">
             	<div class="card-header bg-dark">
-                    <h4 class="text-white">{{ $heading }}<span class="float-right">Total Sale: {{ $sales->where('shop_id', Auth::user()->shop_id)->sum('subTotal') +  $sales->where('shop_id', Auth::user()->shop_id)->sum('additionalCost') -  $sales->where('shop_id', Auth::user()->shop_id)->sum('discount') }}, Paid Amount: {{ $sales->where('shop_id', Auth::user()->shop_id)->sum('paidAmount') }}, Total Profit: {{ $sales->where('shop_id', Auth::user()->shop_id)->sum('profit') }}  </span> </h4>
+                    <h4 class="text-white">{{ $heading }}<span class="float-right">Total Sale: {{ $totalSale }}, Paid Amount: {{ $paidAmount }}, Total Profit: {{ $totalProfit }}  </span> </h4>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered table-striped">

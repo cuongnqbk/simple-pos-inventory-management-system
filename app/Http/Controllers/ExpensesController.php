@@ -15,7 +15,7 @@ class ExpensesController extends Controller
         if(ExpenseField::all()->count() > 0){
             return view('admin.expenses.expenses')
                 ->with('expense_fields', ExpenseField::all())
-                ->with('expenses', Expense::whereDate('created_at', date('Y-m-d'))->orderBy('created_at', 'desc')->get());
+                ->with('expenses', Expense::whereDay('created_at', date('d'))->whereYear('created_at', date('Y'))->orderBy('created_at', 'desc')->get());
         }else{
             Session::flash('error', 'There is no Expense Field');
             return redirect()->back();

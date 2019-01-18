@@ -14,7 +14,43 @@
 
 <section class="allExpense-part m-b-50">
 
-    <div class="row p-t-25">
+	<div class="row">
+        <div class="col">
+            <div class="card border-dark">
+                <div class="card-body">
+                    <form action="{{ route('productEntryReport') }}" method="post">
+                        {{ csrf_field() }}
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>Date From</label>
+                                <input type="text" id="startDate" class="form-control datepicker" name="date_from" value="{{ old('') }}"/>
+                                @if ($errors->has('date_from'))
+                                    <span class="invalid-feedback">
+                                        <strong>{{ $errors->first('date_from') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Date To</label>
+                                <input class="form-control datepicker" name="date_to" value="{{ old('') }}">
+
+                                @if ($errors->has('date_to'))
+                                    <span class="invalid-feedback">
+                                        <strong>{{ $errors->first('date_to') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="col text-right">
+                                <button class="btn btn-primary" name="dateRangeSubmit">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <div class="row p-t-25">
         <div class="col">
             <div class="card border-dark">
             	<div class="card-header bg-dark">

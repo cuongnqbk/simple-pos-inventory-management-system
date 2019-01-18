@@ -22,6 +22,15 @@ class SalesController extends Controller
                     ->with('products', Product::all());
     }
 
+    public function productsBarcodeAjax(Request $request){
+        $product = Product::where('productBarcode', $request->productBarcode)->first();
+        $data = array(
+            'productBarcode' => $request->productBarcode,
+            'price' => $product->salePrice,
+        );
+        echo json_encode($data);
+    }
+
     public function addToCart(Request $request)
     {
         $this->validate($request, [
@@ -30,19 +39,21 @@ class SalesController extends Controller
         ]);
         $product = Product::where('productBarcode', $request->productBarcode)->first();
         $proQuantity = $product->stockQuantity;
-        $buyPrice = $product->buyPrice;
+        $buyPrice = $product->buyPrice;   
+        $qty = $request->quantity;
+
         if(empty($request->special_price)){
             $price = $product->salePrice;
         }else{
             $price = $request->special_price;
         }
-        $availableQuantity = DB::table('product_shop')
-                    ->select('quantity')
-                    ->where('product_id', $product->id)
-                    ->where('shop_id', Auth::user()->shop_id)
-                    ->first();
 
-        $qty = $request->quantity;
+        $availableQuantity = 
+            DB::table('product_shop')
+            ->select('quantity')
+            ->where('product_id', $product->id)
+            ->where('shop_id', Auth::user()->shop_id)
+            ->first();
 
         $pastBuy=0;
         $carts = Cart::content();
@@ -53,6 +64,7 @@ class SalesController extends Controller
                 }
             }  
         }
+
         if($availableQuantity && 
             $proQuantity == $availableQuantity->quantity 
             && $proQuantity > 0){
@@ -71,7 +83,7 @@ class SalesController extends Controller
                         'total_quantity' => $availableQuantity->quantity, 
                         'productBarcode' => $product->productBarcode, 
                         'buyPrice'=>$product->buyPrice, 
-                        'profit'=> ($price - $product->buyPrice) * $qty,
+                        'profit'=> $price - $product->buyPrice,
                     ]
                 ]);
                 $carts=Cart::content();
@@ -84,6 +96,15 @@ class SalesController extends Controller
                     $i++;
                 }
 
+                
+                $profit = 0;
+                if(Cart::count() > 0){
+                    foreach(Cart::content() as $cart){
+                        $subProfit = $cart->options->profit;
+                        $profit += $subProfit;
+                    }                        
+                }              
+                
                 if($pastBuy>0){
                     $data = array(
                         'product_id'=>$product->id,
@@ -97,6 +118,7 @@ class SalesController extends Controller
                         'status'=>true,
                         'past_buy'=>true,
                         'uniqueQuantity' => Cart::content()->count(),
+                        'profit'=> $profit,
                     );
                 }
                 else{
@@ -113,6 +135,7 @@ class SalesController extends Controller
                         'status'=>true,
                         'past_buy'=>false,
                         'uniqueQuantity' => Cart::content()->count(),
+                        'profit'=> $profit,
                     );
                 }
             }
@@ -151,6 +174,7 @@ class SalesController extends Controller
             $quantity = $item->qty;
             $subProfit += ($price-$buyPrice)*$quantity;
         }
+
         $sale = Sale::create([
             'shop_id' => Auth::user()->shop_id,
             'client_id' => $request->client_id,
@@ -221,24 +245,32 @@ class SalesController extends Controller
     public function increment(Request $request, $id){
         $rowId=$request->rowId;
         $item = Cart::get($rowId);
+        $product = Product::find($item->id);
+        $salePrice = $product->salePrice;
+        $buyPrice = $product->buyPrice;
         $productqty = $item->qty;
         $qty = $productqty+1;
         Cart::update($rowId, $qty);
         $data = array(
             'rowId'=> $rowId,
-            'status'=>true
+            'status'=>true,
+            'profit' => $salePrice - $buyPrice,
         );
         echo json_encode($data);
     }
     public function decrement(Request $request, $id){
         $rowId=$request->rowId;
         $item = Cart::get($rowId);
+        $product = Product::find($item->id);
+        $salePrice = $product->salePrice;
+        $buyPrice = $product->buyPrice;
         $productqty = $item->qty;
         $qty = $productqty-1;
         Cart::update($rowId, $qty);
         $data = array(
             'rowId'=> $rowId,
-            'status'=>true
+            'status'=>true,
+            'profit' => $salePrice - $buyPrice,
         );
         echo json_encode($data);
     }
@@ -248,19 +280,23 @@ class SalesController extends Controller
         $productqty = $item->qty;
         $product = Product::find($item->id);
         $totalQty = $product->stockQuantity;
+        $salePrice = $product->salePrice;
+        $buyPrice = $product->buyPrice;
         $qty = $request->qty;
         if($qty > $totalQty){
             $data = array(
                 'errors' => 'Stock Quantity: '. $totalQty,
                 'status'=> false,
-                'old_qty'=> $productqty
+                'old_qty'=> $productqty,
+                'profit' => $salePrice - $buyPrice,
             );
             //$qty = 1;
         }else if($qty < 1){
             $data = array(
                 'errors' => 'Quantity Must be at least 1',
                 'status'=> false,
-                'old_qty'=> $productqty
+                'old_qty'=> $productqty,
+                'profit' => $salePrice - $buyPrice,
             );
             //$qty = 1;
         }else{
@@ -270,7 +306,8 @@ class SalesController extends Controller
                 'rowId'=> $rowId,
                 'status'=>true,
                 'qty' => $request->qty,
-                'old_qty'=> $productqty
+                'old_qty'=> $productqty,
+                'profit' => $salePrice - $buyPrice,
             );
         }
         echo json_encode($data);

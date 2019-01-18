@@ -42,6 +42,9 @@
                                     <input type="text" class="form-control" placeholder="Type" disabled>
                                 </th>
                                 <th>
+                                    <input type="text" class="form-control" placeholder="Buy Price" disabled>
+                                </th>
+                                <th>
                                     <input type="text" class="form-control" placeholder="Sale Price" disabled>
                                 </th>
                                 <th>
@@ -59,6 +62,7 @@
                                 <td>{{ $product->productBarcode }}</td>
         				        <td>{{ $product->productName }}</td>
                                 <td>{{ $product->productType->productType }}</td>
+                                <td>{{ $product->buyPrice }}</td>
                                 <td>{{ $product->salePrice }}</td>
                                 <td>{{ $product->stockQuantity }}</td>
                                 <td>

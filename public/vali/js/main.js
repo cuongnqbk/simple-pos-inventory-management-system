@@ -181,72 +181,6 @@ $(function(){
 
 
     /*  */
-    $('#productBarcode').bind('change', function() {
-        var token = $('input[name=_token]').val(); 
-        var productBarcode = $('#productBarcode').val();
-        var salePrice = $('#salePrice').val();
-        $.ajax({
-            type: "POST",
-            url:  '/admin/productsPostAjax',
-            dataType: 'json',
-            data: {
-                '_token' : token,
-                'productBarcode' : productBarcode,
-                //'salePrice' : salePrice,
-            },
-            success: function(data){ 
-                console.log(data);
-                var id = $('#productBarcode').val();
-                var index = data.findIndex(x => x.productBarcode == id);
-                var salePrice = Number(data[index].salePrice);
-                $('#salePrice').val(salePrice);
-                console.log(salePrice);
-            },
-            error: function(data) {
-                alert(data.responseText);
-            }
-        });        
-    });
-
-    
-
-
-
-    $('.invoiceDetails #client_id').bind('change', function() {
-        var token = $('input[name=_token]').val(); 
-        var client_id = $('#client_id').val();
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            type: "POST",
-            url:  '/admin/clientsPostAjax',
-            dataType: 'json',
-            data: {
-                '_token' : token,
-                'client_id' : client_id
-            },
-            success: function(data){ 
-                var id = $('#client_id').val();
-                var totalBill = Number($('#totalBill').val());
-                var discount = Number($('#discount').val());
-                var index = data.findIndex(x => x.id == id);
-                var contact_no = data[index].contact_no;
-                var address = data[index].address;
-                var previousDue = Number(data[index].previous_due);
-                $('#contact_no').val(contact_no);
-                $('#address').val(address);
-                $('#previousDue').val(previousDue);
-                $('#grandTotal').val(previousDue+totalBill-discount);
-            },
-            error: function(data) {
-                alert(data.responseText);
-            }
-        });        
-    });
-
 
 
     $('.supplierExpense #supplier_id').bind('change', function() {
@@ -321,13 +255,35 @@ $(function(){
         $('#totalDue').val(grandTotal - paidAmount);
     });
 
+    // $('#productBarcode').bind('change', function() {
+    //     var token = $('input[name=_token]').val(); 
+    //     var productBarcode = $('#productBarcode').val();
+    //     var salePrice = $('#salePrice').val();
+    //     $.ajax({
+    //         type: "POST",
+    //         url:  '/admin/productsPostAjax',
+    //         dataType: 'json',
+    //         data: {
+    //             '_token' : token,
+    //             'productBarcode' : productBarcode,
+    //         },
+    //         success: function(data){ 
+    //             console.log(data);
+    //             var salePrice = (+data.price);
+    //             $('#salePrice').val(salePrice);
+    //         },
+    //         error: function(data) {
+    //             console.log(data.responseText);
+    //         }
+    //     });           
+    // });
+
     $('#cartSubmit').on("click", function(event){
         event.preventDefault();
         //$('#noItemRow').remove();
         var token = $('input[name=_token]').val(); 
         var productBarcode = $('#productBarcode').val();
         var quantity = $('#quantity').val();
-        //var uniqueQuantity = $('#uniqueQuantity').val();
         var special_price = $('#special_price').val();
         $("#quantity_errors").hide();
         $("#quantity_errors").html("");
@@ -342,21 +298,22 @@ $(function(){
                 'special_price' : special_price
             },
             success: function(data){
-                if(data.total_quantity > 0 && data.proQuantity == data.total_quantity){
+                if(data.total_quantity > 0 && data.proQuantity == data.total_quantity && data.price != 0){
                     if(data.past_buy === true){
-                        //console.log(data);
+                        console.log(data);
                         var productBarcode = data.productBarcode;
                         var product_id = data.product_id;
                         var name = data.name;
                         var buyPrice = (+data.buyPrice);
-                        var salePrice = Number($('#salePrice').val());
-                        var special_price = Number($('#special_price').val());
+                        var price = data.price;
+                        // var special_price = Number($('#special_price').val());
                         
-                        if(!$('#special_price').val()){
-                            var price = (+salePrice);
-                        }else{
-                            price = (+special_price);
-                        }
+                        // if(!$('#special_price').val()){
+                        //   var price = (+salePrice);
+                        // }else{
+                        //   price = (+special_price);
+                        // }
+                        // var profit = price - price;
                         var qty = data.quantity;
                         var qtyId="qty"+product_id;
                         var subTotalId="subTotal"+product_id;
@@ -377,7 +334,7 @@ $(function(){
                         $("#"+subTotalId).html(subTotal);
                         $("#price"+product_id).html(price);
                         if(old_totalQty>0){
-                            $('#noItemRow').hide();
+                          $('#noItemRow').hide();
                         }
 
                         var old_totalProfit=Number($("#totalProfit").val().replace(",",""));
@@ -388,8 +345,6 @@ $(function(){
                         var old_totalPrice=Number($("#subTotal").val().replace(",",""));
                         old_totalPrice=(+old_totalPrice)-(+oldSubtotal);
                         old_totalPrice=(+old_totalPrice)+(+subTotal);
-
-
 
                         $("#subTotal").val(old_totalPrice);
                         $("#totalBill").val(old_totalPrice);
@@ -403,20 +358,21 @@ $(function(){
                         $('#productBarcode').val('');
                         $('#productBarcode').focus();
                     }else{
-                        //console.log(data);
+                        console.log(data);
                         var productBarcode = data.productBarcode;
                         var product_id = data.product_id;
                         var name = data.name;
                         var buyPrice = (+data.buyPrice);
                         var rowId = data.rowid;
-                        var salePrice = $('#salePrice').val();
-                        var special_price = Number($('#special_price').val());
+                        var price = data.price;
+                        // var special_price = Number($('#special_price').val());
 
-                        if(!$('#special_price').val()){
-                            var price = (+salePrice);
-                        }else{
-                            price = (+special_price);
-                        }
+                        // if(!$('#special_price').val()){
+                        //     var price = (+salePrice);
+                        // }else{
+                        //     price = (+special_price);
+                        // }
+                        // var profit = price - buyPrice;
                         var qty = data.quantity;
                         var total_quantity = data.total_quantity;
                         var total_quantityId="qty"+product_id;
@@ -487,6 +443,41 @@ $(function(){
                 console.log(data.responseText);
             }
         });
+    });
+
+    $('.invoiceDetails #client_id').bind('change', function() {
+        var token = $('input[name=_token]').val(); 
+        var client_id = $('#client_id').val();
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            type: "POST",
+            url:  '/admin/clientsPostAjax',
+            dataType: 'json',
+            data: {
+                '_token' : token,
+                'client_id' : client_id
+            },
+            success: function(data){ 
+                var id = $('#client_id').val();
+                var totalBill = Number($('#totalBill').val());
+                var discount = Number($('#discount').val());
+                var index = data.findIndex(x => x.id == id);
+                var contact_no = data[index].contact_no;
+                var address = data[index].address;
+                var previousDue = Number(data[index].previous_due);
+                $('#contact_no').val(contact_no);
+                $('#address').val(address);
+                $('#previousDue').val(previousDue);
+                $('#grandTotal').val(previousDue+totalBill-discount);
+            },
+            error: function(data) {
+                alert(data.responseText);
+            }
+        });        
     });
 
 });
@@ -588,7 +579,15 @@ function plusQuantity(rowId,total_qty,id,price){
                         old_totalQty=++old_totalQty;
                         $("#totalItems").val(old_totalQty);
 
-                        var old_totalPrice=$("#subTotal").val();                        
+
+                        var profit = (+data.profit);
+
+                        var old_totalProfit=Number($("#totalProfit").val().replace(",",""));
+                        old_totalProfit = (+old_totalProfit) + (+profit) ;
+                        $("#totalProfit").val(+old_totalProfit);
+
+
+                        var old_totalPrice=$("#subTotal").val();
                         old_totalPrice=(+old_totalPrice)+(+price);
                         $("#subTotal").val(old_totalPrice);
                         $("#totalBill").val(old_totalPrice);
@@ -630,6 +629,15 @@ function minusQuantity(rowId,id,price){
                         old_totalQty=--old_totalQty;
                         $("#totalItems").val(old_totalQty);
                         //* for total price *//
+
+
+                        var profit = (+data.profit);
+
+                        var old_totalProfit=Number($("#totalProfit").val().replace(",",""));
+                        old_totalProfit = (+old_totalProfit) - (+profit) ;
+                        $("#totalProfit").val(+old_totalProfit);
+
+
                         var old_totalPrice=$("#subTotal").val();
                         old_totalPrice=(+old_totalPrice)-(+price);
                         $("#subTotal").val(old_totalPrice);
@@ -664,10 +672,7 @@ function chageQty(id, oldQty, rowId, totalQuantity){
         },
         success: function(data) {
             if (data) {
-                /*var qid="qty"+id;
-                var qty = Number($("#"+qid).val());*/
-                /*console.log(data);
-                console.log(qty);*/
+                //console.log(data);
                 if(qty > totalQuantity){
                     var old_qty = data.old_qty;
                     $("#qtyError"+id).show();
@@ -680,7 +685,7 @@ function chageQty(id, oldQty, rowId, totalQuantity){
                     Number($("#"+qid).val(old_qty));
                 }else{
                     $("#qtyError"+id).hide();
-                    var old_qty = data.old_qty;
+                    var old_qty = (+data.old_qty);
 
                     var sub_total=qty*price;
                     var old_sub_total=old_qty*price;
@@ -691,6 +696,22 @@ function chageQty(id, oldQty, rowId, totalQuantity){
                     var old_totalQty= Number($("#totalItems").val());
                     old_totalQty =  (+old_totalQty) + qty - (+old_qty);
                     $("#totalItems").val(old_totalQty);
+
+                    var profit = (+data.profit);
+
+                    var oldProfit = old_qty * profit;
+
+                    var newProfit = qty * profit;
+
+                    var totalProfit = (+newProfit) - (+oldProfit);
+
+                    console.log(typeof(totalProfit));
+
+
+                    var old_totalProfit=Number($("#totalProfit").val().replace(",",""));
+                    old_totalProfit = (+old_totalProfit) + (+totalProfit) ;
+                    $("#totalProfit").val(+old_totalProfit);
+
 
                     var old_totalPrice=$("#subTotal").val();                        
                     old_totalPrice=(+old_totalPrice)+(+sub_total)-(+old_sub_total);
@@ -717,7 +738,7 @@ $(function(){
         }
         $.ajax({
             type: "POST",
-            url:  '/admin/productsPostAjax',
+            url:  '/admin/allProductsAjax',
             dataType: 'json',
             data: {
                 '_token' : token,
@@ -878,7 +899,7 @@ $(function(){
         });
         $.ajax({
             type: "POST",
-            url:  '/admin/productsPostAjax',
+            url:  '/admin/allProductsAjax',
             dataType: 'json',
             data: {
                 '_token' : token,
@@ -908,7 +929,7 @@ $(function(){
         });
         $.ajax({
             type: "POST",
-            url:  '/admin/productsPostAjax',
+            url:  '/admin/allProductsAjax',
             dataType: 'json',
             data: {
                 '_token' : token,

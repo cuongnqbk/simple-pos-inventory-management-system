@@ -61,10 +61,19 @@
     <div class="row p-t-50">
         <div class="col">
             <div class="card border-dark filterable">
-                <div class="card-header text-right bg-dark">
-                    <a class="btn btn-primary" href="{{ route('supplier.supplierExpense') }}" role="button">Add New Supplier Expense</a>
-                    <button id="filter_button" class="btn btn-primary btn-filter"><i class="fa fa-filter"></i> Filter
-                    </button>
+                <div class="card-header bg-dark">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5 class="text-white">Total: {{ $totalExpense }}</h5>
+                        </div>
+                        <div class="col-md-8">                            
+                            <div class="text-right">
+                                <a class="btn btn-primary" href="{{ route('supplier.supplierExpense') }}" role="button">Add New Supplier Expense</a>
+                                <button id="filter_button" class="btn btn-primary btn-filter"><i class="fa fa-filter"></i> Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered table-hover table-striped">
@@ -102,7 +111,7 @@
 					    @endforeach
                         @else
                             <tr>
-                                <td colspan="3" class="text-center">
+                                <td colspan="4" class="text-center">
                                     <div class="alert alert-danger" role="alert">
                                       No Supplier Expense Found
                                     </div>
